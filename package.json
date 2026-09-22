@@ -1,0 +1,219 @@
+{
+  "name": "codeatlas",
+  "displayName": "CodeAtlas",
+  "description": "Local codebase intelligence: hybrid code search, knowledge graph, change impact analysis, and living wiki.",
+  "version": "0.1.0",
+  "publisher": "adityaiitg",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adityaiitg/codeatlas-vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/adityaiitg/codeatlas/issues"
+  },
+  "homepage": "https://github.com/adityaiitg/codeatlas#readme",
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#0d1117",
+    "theme": "dark"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages",
+    "Linters",
+    "Snippets"
+  ],
+  "keywords": [
+    "code search",
+    "knowledge graph",
+    "impact analysis",
+    "call graph",
+    "AST",
+    "blast radius",
+    "hybrid search",
+    "mcp"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codeatlas",
+          "title": "CodeAtlas",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "codeatlas": [
+        {
+          "id": "codeatlas.searchView",
+          "name": "Hybrid Code Search",
+          "contextualTitle": "CodeAtlas Search"
+        },
+        {
+          "id": "codeatlas.impactView",
+          "name": "Blast Radius & Callers",
+          "contextualTitle": "CodeAtlas Impact Analysis"
+        },
+        {
+          "id": "codeatlas.statusView",
+          "name": "Workspace Overview",
+          "contextualTitle": "CodeAtlas Status"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "codeatlas.search",
+        "title": "CodeAtlas: Search Codebase",
+        "icon": "$(search)"
+      },
+      {
+        "command": "codeatlas.impact",
+        "title": "CodeAtlas: Analyze Impact (Blast Radius)",
+        "icon": "$(pulse)"
+      },
+      {
+        "command": "codeatlas.impactCurrent",
+        "title": "CodeAtlas: Find All Callers / Blast Radius for Symbol",
+        "icon": "$(references)"
+      },
+      {
+        "command": "codeatlas.index",
+        "title": "CodeAtlas: Re-index Workspace",
+        "icon": "$(database)"
+      },
+      {
+        "command": "codeatlas.openViewer",
+        "title": "CodeAtlas: Open Interactive Knowledge Graph",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "codeatlas.refresh",
+        "title": "CodeAtlas: Refresh Views",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "codeatlas.installHooks",
+        "title": "CodeAtlas: Install Git Background Hooks"
+      },
+      {
+        "command": "codeatlas.uninstallHooks",
+        "title": "CodeAtlas: Uninstall Git Background Hooks"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "codeatlas.impactCurrent",
+          "when": "editorHasSelection || editorTextFocus",
+          "group": "navigation@10"
+        },
+        {
+          "command": "codeatlas.search",
+          "when": "editorHasSelection",
+          "group": "navigation@11"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "codeatlas.refresh",
+          "when": "view == codeatlas.searchView || view == codeatlas.impactView || view == codeatlas.statusView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "codeatlas.openViewer",
+          "when": "view == codeatlas.impactView || view == codeatlas.statusView",
+          "group": "navigation@2"
+        },
+        {
+          "command": "codeatlas.index",
+          "when": "view == codeatlas.statusView",
+          "group": "navigation@3"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "codeatlas.search"
+        },
+        {
+          "command": "codeatlas.impact"
+        },
+        {
+          "command": "codeatlas.impactCurrent"
+        },
+        {
+          "command": "codeatlas.index"
+        },
+        {
+          "command": "codeatlas.openViewer"
+        },
+        {
+          "command": "codeatlas.refresh"
+        },
+        {
+          "command": "codeatlas.installHooks"
+        },
+        {
+          "command": "codeatlas.uninstallHooks"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "CodeAtlas",
+      "properties": {
+        "codeatlas.executable": {
+          "type": "string",
+          "default": "codeatlas",
+          "description": "Path or command for the CodeAtlas CLI executable (default: 'codeatlas' on PATH). Can also be 'uvx codeatlas-cli' or an absolute path."
+        },
+        "codeatlas.embedder": {
+          "type": "string",
+          "enum": ["model2vec", "ort"],
+          "default": "model2vec",
+          "description": "Embedding engine to use for search and indexing: 'model2vec' (fast pure-Rust, default) or 'ort' (ONNX Runtime transformer)."
+        },
+        "codeatlas.autoIndex": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically incrementally re-index on workspace open and file save."
+        },
+        "codeatlas.codelensEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show CodeLens caller count annotations above function and class definitions."
+        },
+        "codeatlas.statusBarEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show CodeAtlas status item in the editor status bar."
+        },
+        "codeatlas.searchLimit": {
+          "type": "integer",
+          "default": 10,
+          "description": "Default maximum number of results to return for search queries."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.1",
+    "typescript": "^5.3.0"
+  }
+}
